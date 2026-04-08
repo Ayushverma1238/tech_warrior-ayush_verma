@@ -26,7 +26,7 @@ public class DashboardService {
     public DashboardResponse getDashboard(Long userId) {
 
         List<Income> incomes = incomeRepo.findByUserId(userId);
-        List<Expense> expenses = expenseRepo.findByUserId(userId);
+        List<Expense> expenses = expenseRepo.findByUser_Id(userId);
 
         double totalIncome = incomes.stream()
                 .mapToDouble(Income::getAmount)

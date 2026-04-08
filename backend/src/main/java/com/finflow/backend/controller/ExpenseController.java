@@ -1,13 +1,7 @@
 package com.finflow.backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.finflow.backend.model.Expense;
 import com.finflow.backend.service.ExpenseService;
@@ -23,19 +17,51 @@ public class ExpenseController {
 
     private final ExpenseService service;
 
+    // CREATE 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody Expense expense) {
+    public ResponseEntity<?> add(
+            @RequestParam Long userId,
+            @RequestBody Expense expense) {
+
         return ResponseBuilder.success(
                 "Expense added",
-                service.add(expense)
-        );
+                service.add(userId, expense));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> get(@PathVariable Long userId) {
+    // GET (All + Filter)
+    @GetMapping
+    public ResponseEntity<?> getExpenses(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String category) {
+
         return ResponseBuilder.success(
                 "Expenses fetched",
-                service.getByUser(userId)
-        );
+                service.getExpenses(userId, category));
+    }
+
+    // GET by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return ResponseBuilder.success(
+                "Expense fetched",
+                service.getById(id));
+    }
+
+    // UPDATE
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(
+            @PathVariable Long id,
+            @RequestBody Expense expense) {
+
+        return ResponseBuilder.success(
+                "Expense updated",
+                service.update(id, expense));
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseBuilder.success("Expense deleted", null);
     }
 }
