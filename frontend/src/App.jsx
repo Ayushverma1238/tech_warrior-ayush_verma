@@ -9,8 +9,17 @@ import Expenses from "./pages/Expenses";
 import Income from "./pages/Income";
 import Tax from "./pages/Tax";
 import Login from "./pages/Login";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { getUser } from "./features/auth/authSlice";
 
 function App() {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getUser());
+    }, [dispatch]);
+
     return (
         <BrowserRouter>
             <Routes>

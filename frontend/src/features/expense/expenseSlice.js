@@ -6,6 +6,7 @@ export const fetchExpenses = createAsyncThunk(
     async (_, { getState, rejectWithValue }) => {
         try {
             const userId = getState().auth.user?.id;
+            if (!userId) throw new Error("User not loaded");
             const res = await API.get(`/api/expense?userId=${userId}`);
             return res.data.data;
         } catch (err) {
@@ -16,12 +17,25 @@ export const fetchExpenses = createAsyncThunk(
 
 export const addExpense = createAsyncThunk(
     "expense/add",
-    async (data, { rejectWithValue }) => {
+    async (data, { getState, rejectWithValue }) => {
         try {
-            const res = await API.post("/api/expense/add", data);
-            return res.data;
+            const userId = getState().auth.user?.id;
+             console.log("USER ID:", userId);
+            console.log("DATA:", data);
+
+            if (!userId) throw new Error("User not found");
+
+            const res = await API.post(
+                `/api/expense?userId=${userId}`,
+                data,
+            );
+
+            console.log("RESPONSE:", res.data);
+
+            return res.data.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data);
+            console.error("ERROR:", err);
+            return rejectWithValue(err.response?.data || err.message);
         }
     }
 );
@@ -31,10 +45,12 @@ const expenseSlice = createSlice({
     initialState: {
         list: [],
         loading: false,
+        error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // FETCH
             .addCase(fetchExpenses.pending, (state) => {
                 state.loading = true;
             })
@@ -46,6 +62,10 @@ const expenseSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            .addCase(addExpense.fulfilled, (state, action) => {
+                state.list.unshift(action.payload);
+            });
     },
 });
 

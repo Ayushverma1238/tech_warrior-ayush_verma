@@ -23,11 +23,9 @@ public class DashboardService {
 
         public DashboardResponse getDashboard(Long userId) {
 
-                // FIXED (use correct JPA method)
                 List<Income> incomes = incomeRepo.findByUser_Id(userId);
                 List<Expense> expenses = expenseRepo.findByUser_Id(userId);
 
-                // TOTALS
                 double totalIncome = incomes.stream()
                                 .mapToDouble(Income::getAmount)
                                 .sum();
@@ -36,33 +34,34 @@ public class DashboardService {
                                 .mapToDouble(Expense::getAmount)
                                 .sum();
 
-                double netProfit = totalIncome - totalExpense;
+                double net = totalIncome - totalExpense;
+
+                double savings = Math.max(0, net);
+                double loss = Math.max(0, -net);
 
                 // MONTHLY DATA
                 Map<Integer, MonthlyData> monthlyMap = new HashMap<>();
 
-                // Income processing
                 for (Income income : incomes) {
-                        int month = income.getDate().getMonthValue();
+                        int m = income.getDate().getMonthValue();
 
                         monthlyMap.putIfAbsent(
-                                        month,
-                                        new MonthlyData(Month.of(month).name(), 0, 0));
+                                        m,
+                                        new MonthlyData(Month.of(m).name(), 0, 0));
 
-                        MonthlyData data = monthlyMap.get(month);
-                        data.setIncome(data.getIncome() + income.getAmount());
+                        monthlyMap.get(m).setIncome(
+                                        monthlyMap.get(m).getIncome() + income.getAmount());
                 }
 
-                // Expense processing
                 for (Expense expense : expenses) {
-                        int month = expense.getDate().getMonthValue();
+                        int m = expense.getDate().getMonthValue();
 
                         monthlyMap.putIfAbsent(
-                                        month,
-                                        new MonthlyData(Month.of(month).name(), 0, 0));
+                                        m,
+                                        new MonthlyData(Month.of(m).name(), 0, 0));
 
-                        MonthlyData data = monthlyMap.get(month);
-                        data.setExpense(data.getExpense() + expense.getAmount());
+                        monthlyMap.get(m).setExpense(
+                                        monthlyMap.get(m).getExpense() + expense.getAmount());
                 }
 
                 List<MonthlyData> monthlyData = monthlyMap.entrySet().stream()
@@ -70,34 +69,30 @@ public class DashboardService {
                                 .map(Map.Entry::getValue)
                                 .toList();
 
-                // CATEGORY BREAKDOWN (for pie chart)
+                // CATEGORY BREAKDOWN
                 Map<String, Double> categoryBreakdown = new HashMap<>();
-
-                for (Expense expense : expenses) {
+                for (Expense e : expenses) {
                         categoryBreakdown.put(
-                                        expense.getCategory(),
-                                        categoryBreakdown.getOrDefault(
-                                                        expense.getCategory(), 0.0) + expense.getAmount());
+                                        e.getCategory(),
+                                        categoryBreakdown.getOrDefault(e.getCategory(), 0.0) + e.getAmount());
                 }
 
-                // INCOME SOURCE BREAKDOWN
+                // INCOME BREAKDOWN
                 Map<String, Double> incomeBreakdown = new HashMap<>();
-
-                for (Income income : incomes) {
+                for (Income i : incomes) {
                         incomeBreakdown.put(
-                                        income.getSource(),
-                                        incomeBreakdown.getOrDefault(
-                                                        income.getSource(), 0.0) + income.getAmount());
+                                        i.getSource(),
+                                        incomeBreakdown.getOrDefault(i.getSource(), 0.0) + i.getAmount());
                 }
 
-                // FINAL RESPONSE
                 return DashboardResponse.builder()
                                 .totalIncome(totalIncome)
                                 .totalExpense(totalExpense)
-                                .netProfit(netProfit)
+                                .savings(savings)
+                                .loss(loss)
                                 .monthlyData(monthlyData)
-                                .categoryBreakdown(categoryBreakdown) 
-                                .incomeBreakdown(incomeBreakdown) 
+                                .categoryBreakdown(categoryBreakdown)
+                                .incomeBreakdown(incomeBreakdown)
                                 .build();
         }
 }

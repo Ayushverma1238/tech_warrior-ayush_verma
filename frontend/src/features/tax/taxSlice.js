@@ -17,12 +17,23 @@ const taxSlice = createSlice({
     name: "tax",
     initialState: {
         data: null,
+        loading: false,
+        error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchTax.fulfilled, (state, action) => {
-            state.data = action.payload;
-        });
+        builder
+            .addCase(fetchTax.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTax.fulfilled, (state, action) => {
+                state.loading = false;
+                state.data = action.payload;
+            })
+            .addCase(fetchTax.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     },
 });
 

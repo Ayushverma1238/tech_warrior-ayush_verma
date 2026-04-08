@@ -18,7 +18,9 @@ public class DashboardResponse {
 
     private double totalIncome;
     private double totalExpense;
-    private double netProfit;
+
+    private double savings; 
+    private double loss;
 
     private List<MonthlyData> monthlyData;
 
