@@ -1,6 +1,7 @@
 package com.finflow.backend.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,7 @@ public class DashboardResponse {
     private double netProfit;
 
     private List<MonthlyData> monthlyData;
+
+    private Map<String, Double> categoryBreakdown;
+    private Map<String, Double> incomeBreakdown;
 }
