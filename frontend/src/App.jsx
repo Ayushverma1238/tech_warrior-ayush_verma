@@ -1,30 +1,46 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+import Layout from "./components/layout/Layout";
+
+import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import Income from "./pages/Income";
 import Tax from "./pages/Tax";
-import Navbar from "./components/Navbar";
-import Dashboard from "./pages/Dashboard"
+import Login from "./pages/Login";
 
 function App() {
     return (
         <BrowserRouter>
-            <div className="flex">
-                <Sidebar />
+            <Routes>
 
-                <div className="flex-1 bg-gray-100 min-h-screen">
-                    <Navbar />
+                {/* Public */}
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
 
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/dashboard" />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/expenses" element={<Expenses />} />
-                        <Route path="/income" element={<Income />} />
-                        <Route path="/tax" element={<Tax />} />
-                    </Routes>
-                </div>
-            </div>
+                {/* Protected */}
+                <Route
+                    element={
+                        <ProtectedRoute>
+                            <Layout />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/expenses" element={<Expenses />} />
+                    <Route path="/income" element={<Income />} />
+                    <Route path="/tax" element={<Tax />} />
+                </Route>
+
+            </Routes>
         </BrowserRouter>
     );
 }

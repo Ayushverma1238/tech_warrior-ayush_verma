@@ -1,14 +1,20 @@
 import { NavLink } from "react-router-dom";
+import { cn } from "../../lib/utils";
 
 const Sidebar = () => {
-  const linkClass =
-    "block px-4 py-2 rounded-lg hover:bg-gray-700 transition";
+  const linkClass = ({ isActive }) =>
+    cn(
+      "block px-4 py-2 rounded-lg text-sm font-medium",
+      isActive
+        ? "bg-primary text-white"
+        : "text-muted-foreground hover:bg-muted"
+    );
 
   return (
-    <div className="w-64 h-screen bg-gray-900 text-white p-6 flex flex-col">
-      <h1 className="text-2xl font-bold mb-10">FinFlow</h1>
+    <div className="w-64 h-screen border-r bg-background p-4">
+      <h1 className="text-xl font-bold mb-6">FinFlow</h1>
 
-      <nav className="space-y-3">
+      <nav className="space-y-2">
         <NavLink to="/dashboard" className={linkClass}>
           Dashboard
         </NavLink>
