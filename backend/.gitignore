@@ -1,0 +1,59 @@
+# ===============================
+# SENSITIVE FILES (VERY IMPORTANT)
+# ===============================
+application.properties
+application.yml
+.env
+
+# ===============================
+# BUILD FILES
+# ===============================
+target/
+build/
+out/
+
+# ===============================
+# MAVEN
+# ===============================
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===============================
+# IDE FILES
+# ===============================
+
+## IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+## Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+## VS Code
+.vscode/
+
+# ===============================
+# OS FILES
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# LOG FILES
+# ===============================
+*.log
+
+# ===============================
+# TEMP FILES
+# ===============================
+*.tmp
+*.swp
