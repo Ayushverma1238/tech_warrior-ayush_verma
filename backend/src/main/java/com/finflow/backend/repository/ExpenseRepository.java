@@ -8,4 +8,6 @@ import com.finflow.backend.model.Expense;
 
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByUser_Id(Long userId);
+
+    List<Expense> findByUser_IdAndCategoryIgnoreCase(Long userId, String category);
 }
