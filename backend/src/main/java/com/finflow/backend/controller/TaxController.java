@@ -7,31 +7,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.finflow.backend.exception.ResourceNotFoundException;
 import com.finflow.backend.security.CustomUserDetails;
-import com.finflow.backend.service.DashboardService;
+import com.finflow.backend.service.TaxService;
 import com.finflow.backend.util.ResponseBuilder;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping("/api/tax")
 @RequiredArgsConstructor
 @CrossOrigin
-public class DashboardController {
+public class TaxController {
 
-    private final DashboardService service;
+    private final TaxService service;
 
     @GetMapping
-    public ResponseEntity<?> getDashboard(
+    public ResponseEntity<?> getTax(
             @AuthenticationPrincipal CustomUserDetails user) {
 
-        if (user == null) {
-            throw new ResourceNotFoundException("Unauthorized user");
-        }
-
         return ResponseBuilder.success(
-                "Dashboard fetched",
-                service.getDashboard(user.getId()));
+                "Tax calculated",
+                service.calculateTax(user.getId()));
     }
 }

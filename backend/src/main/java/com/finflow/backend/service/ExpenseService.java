@@ -23,7 +23,7 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> getByUser(Long userId) {
-        return expenseRepository.findByUserId(userId)
+        return expenseRepository.findByUser_Id(userId)
                 .stream()
                 .map(ExpenseMapper::toDTO)
                 .toList();
