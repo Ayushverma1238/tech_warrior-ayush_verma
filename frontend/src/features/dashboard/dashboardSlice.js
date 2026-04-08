@@ -7,9 +7,21 @@ export const fetchDashboard = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const res = await API.get("/api/dashboard");
-            return res.data;
+            return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data || "Error");
+        }
+    }
+);
+
+export const addExpense = createAsyncThunk(
+    "expense/add",
+    async (data, { rejectWithValue }) => {
+        try {
+            const res = await API.post("/api/expense/add", data);
+            return res.data.data; 
+        } catch (err) {
+            return rejectWithValue(err.response?.data);
         }
     }
 );

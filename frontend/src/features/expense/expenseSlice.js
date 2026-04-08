@@ -3,10 +3,11 @@ import API from "../../services/api";
 
 export const fetchExpenses = createAsyncThunk(
     "expense/fetch",
-    async (_, { rejectWithValue }) => {
+    async (_, { getState, rejectWithValue }) => {
         try {
-            const res = await API.get("/api/expense?userId=1");
-            return res.data;
+            const userId = getState().auth.user?.id;
+            const res = await API.get(`/api/expense?userId=${userId}`);
+            return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data);
         }
@@ -34,12 +35,17 @@ const expenseSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            .addCase(fetchExpenses.pending, (state) => {
+                state.loading = true;
+            })
             .addCase(fetchExpenses.fulfilled, (state, action) => {
+                state.loading = false;
                 state.list = action.payload;
             })
-            .addCase(addExpense.fulfilled, (state, action) => {
-                state.list.push(action.payload);
-            });
+            .addCase(fetchExpenses.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     },
 });
 

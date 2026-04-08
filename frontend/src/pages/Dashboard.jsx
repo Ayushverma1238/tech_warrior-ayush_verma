@@ -10,9 +10,13 @@ const Dashboard = () => {
     const dispatch = useDispatch();
     const { data, loading } = useSelector((state) => state.dashboard);
 
+    const token = useSelector((state) => state.auth.token);
+
     useEffect(() => {
-        dispatch(fetchDashboard());
-    }, [dispatch]);
+        if (token) {
+            dispatch(fetchDashboard());
+        }
+    }, [dispatch, token]);
 
     if (loading || !data) return <p>Loading...</p>;
 
@@ -28,10 +32,10 @@ const Dashboard = () => {
             {/* Charts */}
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                 <LineChartComponent data={data.monthlyData} />
-                <PieChartComponent data={data.categoryBreakdown} title="Expenses" />
+                <PieChartComponent data={data?.categoryBreakdown || []} title="Expenses" />
             </div>
 
-            <PieChartComponent data={data.incomeBreakdown} title="Income Sources" />
+            <PieChartComponent data={data?.incomeBreakdown || []} title="Income Sources" />
         </div>
     );
 };

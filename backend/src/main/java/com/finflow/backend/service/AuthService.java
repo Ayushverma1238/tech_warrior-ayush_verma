@@ -19,6 +19,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     // ================== REGISTER =====================
     public AuthResponse register(User user) {
@@ -27,7 +28,7 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         return AuthResponse.builder()
-                .id(savedUser.getId())  
+                .id(savedUser.getId())
                 .name(savedUser.getName())
                 .email(savedUser.getEmail())
                 .token(null)
@@ -44,7 +45,7 @@ public class AuthService {
             throw new BadRequestException("Invalid password");
         }
 
-        String token = JwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail());
 
         return AuthResponse.builder()
                 .id(user.getId())

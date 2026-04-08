@@ -22,9 +22,9 @@ public class IncomeService {
     private final UserRepository userRepository;
 
     // CREATE
-    public IncomeDTO addIncome(Long userId, IncomeDTO dto) {
+    public IncomeDTO addIncome(String email, IncomeDTO dto) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Income income = IncomeMapper.toEntity(dto);
@@ -34,15 +34,18 @@ public class IncomeService {
     }
 
     // READ (ALL + FILTER)
-    public List<IncomeDTO> getIncomes(Long userId, String source) {
+    public List<IncomeDTO> getIncomes(String email, String source) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Income> incomes;
 
         if (source != null && !source.isBlank()) {
             incomes = incomeRepository
-                    .findByUser_IdAndSourceIgnoreCase(userId, source);
+                    .findByUser_IdAndSourceIgnoreCase(user.getId(), source);
         } else {
-            incomes = incomeRepository.findByUser_Id(userId);
+            incomes = incomeRepository.findByUser_Id(user.getId());
         }
 
         return incomes.stream()

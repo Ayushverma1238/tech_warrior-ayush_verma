@@ -3,9 +3,13 @@ import API from "../../services/api";
 
 export const fetchTax = createAsyncThunk(
     "tax/fetch",
-    async () => {
-        const res = await API.get("/api/tax");
-        return res.data;
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await API.get("/api/tax");
+            return res.data.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data);
+        }
     }
 );
 

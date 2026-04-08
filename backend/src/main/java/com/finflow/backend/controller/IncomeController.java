@@ -1,6 +1,7 @@
 package com.finflow.backend.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,26 +27,31 @@ public class IncomeController {
 
     private final IncomeService service;
 
+    private String getCurrentUserEmail() {
+        return SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+    }
+
     // CREATE
     @PostMapping
     public ResponseEntity<?> add(
-            @RequestParam Long userId,
             @RequestBody IncomeDTO dto) {
 
         return ResponseBuilder.success(
                 "Income added",
-                service.addIncome(userId, dto));
+                service.addIncome(getCurrentUserEmail(), dto));
     }
 
     // GET ALL
     @GetMapping
     public ResponseEntity<?> get(
-            @RequestParam Long userId,
             @RequestParam(required = false) String source) {
 
         return ResponseBuilder.success(
                 "Income fetched",
-                service.getIncomes(userId, source));
+                service.getIncomes(getCurrentUserEmail(), source));
     }
 
     // GET BY ID
