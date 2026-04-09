@@ -32,7 +32,6 @@ frontend/dist/
 # ======================
 # JAVA / SPRING BOOT (BACKEND)
 # ======================
-target/
 *.log
 
 # IDE
