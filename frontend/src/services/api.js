@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://finflow.onrender.com",
+    baseURL: "https://finflow-gg7q.onrender.com",
 });
 
 // Request interceptor
