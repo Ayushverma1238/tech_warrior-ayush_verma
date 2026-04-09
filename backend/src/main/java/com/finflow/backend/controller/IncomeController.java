@@ -47,11 +47,11 @@ public class IncomeController {
     // GET ALL
     @GetMapping
     public ResponseEntity<?> get(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String source) {
-
         return ResponseBuilder.success(
                 "Income fetched",
-                service.getIncomes(getCurrentUserEmail(), source));
+                service.getIncomes(getCurrentUserEmail(), keyword, source));
     }
 
     // GET BY ID

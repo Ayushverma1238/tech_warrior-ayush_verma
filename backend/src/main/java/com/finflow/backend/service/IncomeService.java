@@ -23,7 +23,6 @@ public class IncomeService {
 
     // CREATE
     public IncomeDTO addIncome(String email, IncomeDTO dto) {
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -33,19 +32,36 @@ public class IncomeService {
         return IncomeMapper.toDTO(incomeRepository.save(income));
     }
 
-    // READ (ALL + FILTER)
-    public List<IncomeDTO> getIncomes(String email, String source) {
+    // ✅ SEARCH + FILTER + SORT
+    public List<IncomeDTO> getIncomes(
+            String email,
+            String keyword,
+            String source
+    ) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Income> incomes;
 
-        if (source != null && !source.isBlank()) {
+        // ✅ 1. SEARCH (PRIORITY)
+        if (keyword != null && !keyword.isBlank()) {
+            incomes = incomeRepository.search(user.getId(), keyword);
+        }
+
+        // ✅ 2. SOURCE FILTER
+        else if (source != null && !source.isBlank()) {
             incomes = incomeRepository
-                    .findByUser_IdAndSourceIgnoreCase(user.getId(), source);
-        } else {
-            incomes = incomeRepository.findByUser_Id(user.getId());
+                    .findByUser_IdAndSourceIgnoreCaseOrderByDateDesc(
+                            user.getId(),
+                            source
+                    );
+        }
+
+        // ✅ 3. DEFAULT (ALL SORTED)
+        else {
+            incomes = incomeRepository
+                    .findByUser_IdOrderByDateDesc(user.getId());
         }
 
         return incomes.stream()
@@ -53,7 +69,7 @@ public class IncomeService {
                 .toList();
     }
 
-    // READ (Single)
+    // READ SINGLE
     public IncomeDTO getById(Long id) {
         Income income = incomeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Income not found"));

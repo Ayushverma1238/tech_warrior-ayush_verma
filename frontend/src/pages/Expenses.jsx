@@ -1,19 +1,32 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchExpenses, addExpense } from "../features/expense/expenseSlice";
+import {
+    fetchExpenses,
+    addExpense,
+    updateExpense,
+    deleteExpense,
+} from "../features/expense/expenseSlice";
+
+import ExpenseForm from "@/components/expense/ExpenseForm";
+import ExpenseTable from "@/components/expense/ExpenseTable";
+import ExpenseCard from "@/components/expense/ExpenseCard";
+
+import { toast } from "sonner";
+
+import {
+    Wallet,
+    TrendingDown,
+    Receipt,
+    IndianRupee,
+} from "lucide-react";
+import { formatINR } from "@/utils/format";
 
 const Expenses = () => {
     const dispatch = useDispatch();
+    const [editItem, setEditItem] = useState(null);
+
     const { list, loading } = useSelector((state) => state.expense);
-
     const { user } = useSelector((state) => state.auth);
-
-    const [form, setForm] = useState({
-        title: "",
-        amount: "",
-        category: "",
-        date: "",
-    });
 
     useEffect(() => {
         if (user?.id) {
@@ -21,123 +34,145 @@ const Expenses = () => {
         }
     }, [dispatch, user]);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const handleSubmit = (form) => {
+        if (editItem) {
+            dispatch(updateExpense({ id: editItem.id, data: form }))
+                .unwrap()
+                .then(() => {
+                    toast.success("Expense updated");
+                    setEditItem(null);
+                })
+                .catch(() => toast.error("Failed to update expense"));
+        } else {
+            dispatch(addExpense(form))
+                .unwrap()
+                .then(() => toast.success("Expense added"))
+                .catch(() => toast.error("Failed to add expense"));
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleDelete = (id) => {
+        const promise = dispatch(deleteExpense(id)).unwrap();
 
-        if (!user?.id) {
-            alert("User not loaded yet");
-            return;
-        }
-
-        if (!form.title || !form.amount) return;
-
-        dispatch(addExpense(form));
-
-        setForm({
-            title: "",
-            amount: "",
-            category: "",
-            date: "",
+        toast.promise(promise, {
+            loading: "Deleting...",
+            success: "Expense deleted",
+            error: "Failed to delete",
         });
     };
 
+    const totalExpense = list.reduce(
+        (acc, item) => acc + Number(item.amount || 0),
+        0
+    );
+
+    const avgExpense = list.length
+        ? Math.round(totalExpense / list.length)
+        : 0;
+
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 md:p-10 space-y-8 min-h-screen bg-linear-to-br from-red-50 via-white to-slate-100">
 
-            {/* Header */}
-            <h2 className="text-2xl font-bold text-gray-800">💸 Expenses</h2>
+            {/* HEADER */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                        <Wallet className="w-7 h-7 text-red-500" />
+                        Expense Dashboard
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Track and control your spending habits
+                    </p>
+                </div>
 
-            {/* Form */}
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-5 rounded-2xl shadow-md grid md:grid-cols-5 gap-4"
-            >
-                <input
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Title"
-                    className="input border p-2 rounded-lg"
+                <ExpenseForm
+                    onSubmit={handleSubmit}
+                    editData={editItem}
+                    setEditData={setEditItem}
                 />
+            </div>
 
-                <input
-                    name="amount"
-                    value={form.amount}
-                    onChange={handleChange}
-                    placeholder="Amount"
-                    type="number"
-                    className="input border p-2 rounded-lg"
-                />
+            {/* STATS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-                <input
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    placeholder="Category"
-                    className="input border p-2 rounded-lg"
-                />
+                {/* TOTAL */}
+                <div className="bg-white rounded-2xl shadow-md p-5 flex justify-between items-center hover:shadow-xl transition">
+                    <div>
+                        <p className="text-sm text-gray-500">Total Expenses</p>
+                        <h2 className="text-2xl font-bold text-red-600 mt-1">
+                            ₹ {formatINR(totalExpense)}
+                        </h2>
+                    </div>
+                    <div className="bg-red-100 p-3 rounded-xl">
+                        <TrendingDown className="text-red-600 w-6 h-6" />
+                    </div>
+                </div>
 
-                <input
-                    name="date"
-                    value={form.date}
-                    onChange={handleChange}
-                    type="date"
-                    className="input border p-2 rounded-lg"
-                />
+                {/* COUNT */}
+                <div className="bg-white rounded-2xl shadow-md p-5 flex justify-between items-center hover:shadow-xl transition">
+                    <div>
+                        <p className="text-sm text-gray-500">Entries</p>
+                        <h2 className="text-2xl font-bold text-gray-800 mt-1">
+                            {list.length}
+                        </h2>
+                    </div>
+                    <div className="bg-blue-100 p-3 rounded-xl">
+                        <Receipt className="text-blue-600 w-6 h-6" />
+                    </div>
+                </div>
 
-                <button
-                    disabled={!user?.id}
-                    className="bg-blue-600 disabled:bg-gray-400 text-white rounded-lg px-4 py-2 transition"
-                >
-                    Add
-                </button>
-            </form>
+                {/* AVG */}
+                <div className="bg-white rounded-2xl shadow-md p-5 flex justify-between items-center hover:shadow-xl transition">
+                    <div>
+                        <p className="text-sm text-gray-500">Avg Expense</p>
+                        <h2 className="text-2xl font-bold text-purple-600 mt-1">
+                            ₹ {formatINR(avgExpense)}
+                        </h2>
+                    </div>
+                    <div className="bg-purple-100 p-3 rounded-xl">
+                        <IndianRupee className="text-purple-600 w-6 h-6" />
+                    </div>
+                </div>
+            </div>
 
-            {/* Table */}
-            <div className="bg-white shadow rounded-2xl overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th className="p-3 text-left">Title</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
+            {/* CONTENT */}
+            <div className="bg-white rounded-2xl shadow-md p-5">
 
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan="4" className="p-4 text-center">
-                                    Loading...
-                                </td>
-                            </tr>
-                        ) : list.length === 0 ? (
-                            <tr>
-                                <td colSpan="4" className="p-4 text-center text-gray-500">
-                                    No expenses yet
-                                </td>
-                            </tr>
-                        ) : (
-                            list.map((e) => (
-                                <tr key={e.id} className="border-t hover:bg-gray-50">
-                                    <td className="p-3">{e.title}</td>
-                                    <td className="text-center font-medium">
-                                        ₹ {e.amount}
-                                    </td>
-                                    <td className="text-center">{e.category}</td>
-                                    <td className="text-center">
-                                        {e.date?.slice(0, 10)}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                {loading ? (
+                    <div className="flex justify-center py-16 text-gray-500">
+                        Loading expenses...
+                    </div>
+                ) : list.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <Wallet className="w-12 h-12 text-gray-300 mb-4" />
+                        <p className="text-gray-500 text-sm">
+                            No expenses recorded yet
+                        </p>
+                        <p className="text-gray-400 text-xs mt-1">
+                            Start tracking your spending now
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        {/* DESKTOP */}
+                        <div className="hidden md:block">
+                            <ExpenseTable
+                                list={list}
+                                onEdit={setEditItem}
+                                onDelete={handleDelete}
+                            />
+                        </div>
+
+                        {/* MOBILE */}
+                        <div className="md:hidden">
+                            <ExpenseCard
+                                list={list}
+                                onEdit={setEditItem}
+                                onDelete={handleDelete}
+                            />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

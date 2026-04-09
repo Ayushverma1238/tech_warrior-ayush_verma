@@ -1,3 +1,4 @@
+import { formatINR } from "@/utils/format";
 import {
     LineChart,
     Line,
@@ -9,56 +10,56 @@ import {
     Legend
 } from "recharts";
 
-const LineChartComponent = ({ data = [] }) => {
+const LineChartComponent = ({ data = [], title = "Monthly Overview" }) => {
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return (
+            <div className="bg-white p-5 rounded-2xl shadow">
+                <h3 className="mb-4 font-semibold text-gray-700">{title}</h3>
+                <p className="text-center text-gray-400">No data available</p>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-white p-5 rounded-2xl shadow hover:shadow-lg transition">
 
-            <h3 className="mb-4 font-semibold text-gray-700">
-                Monthly Overview
-            </h3>
+            <h3 className="mb-4 font-semibold text-gray-700">{title}</h3>
 
-            {data.length === 0 ? (
-                <p className="text-center text-gray-400">
-                    No data available
-                </p>
-            ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={data}>
+            <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={data}>
 
-                        <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" />
 
-                        <XAxis dataKey="month" />
-                        <YAxis />
+                    <XAxis dataKey="month" />
+                    <YAxis />
 
-                        <Tooltip
-                            formatter={(value) => `₹ ${value}`}
-                        />
+                    <Tooltip formatter={(value) => formatINR(value)} />
 
-                        <Legend />
+                    <Legend />
 
-                        <Line
-                            type="monotone"
-                            dataKey="income"
-                            stroke="#22c55e"
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                            animationDuration={800}
-                        />
+                    <Line
+                        type="monotone"
+                        dataKey="income"
+                        stroke="#22c55e"
+                        strokeWidth={3}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                        animationDuration={800}
+                    />
 
-                        <Line
-                            type="monotone"
-                            dataKey="expense"
-                            stroke="#ef4444"
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                            animationDuration={800}
-                        />
+                    <Line
+                        type="monotone"
+                        dataKey="expense"
+                        stroke="#ef4444"
+                        strokeWidth={3}
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                        animationDuration={800}
+                    />
 
-                    </LineChart>
-                </ResponsiveContainer>
-            )}
+                </LineChart>
+            </ResponsiveContainer>
         </div>
     );
 };

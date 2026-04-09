@@ -1,3 +1,4 @@
+import { formatINR } from "@/utils/format";
 import {
     PieChart,
     Pie,
@@ -12,14 +13,16 @@ const COLORS = [
     "#3b82f6", "#a855f7"
 ];
 
-const PieChartComponent = ({ data = [], title }) => {
+const PieChartComponent = ({ data = [], title = "Overview" }) => {
 
     const chartData = Array.isArray(data) ? data : [];
 
-    // calculate total
-    const total = chartData.reduce((sum, d) => sum + d.value, 0);
+    const total = chartData.reduce(
+        (sum, d) => sum + Number(d.value ?? 0),
+        0
+    );
 
-    if (chartData.length === 0) {
+    if (chartData.length === 0 || total === 0) {
         return (
             <div className="bg-white p-5 rounded-2xl shadow">
                 <h3 className="mb-4 font-semibold">{title}</h3>
@@ -43,10 +46,10 @@ const PieChartComponent = ({ data = [], title }) => {
                         dataKey="value"
                         nameKey="name"
                         outerRadius={90}
-                        innerRadius={50} // 🔥 donut style
+                        innerRadius={55}
                         paddingAngle={3}
                         animationDuration={800}
-                        label={({ name, value }) =>
+                        label={({ value }) =>
                             `${((value / total) * 100).toFixed(0)}%`
                         }
                     >
@@ -58,13 +61,7 @@ const PieChartComponent = ({ data = [], title }) => {
                         ))}
                     </Pie>
 
-                    <Tooltip
-                        formatter={(value) => `₹ ${value}`}
-                        contentStyle={{
-                            borderRadius: "10px",
-                            border: "none",
-                        }}
-                    />
+                    <Tooltip formatter={(value) => formatINR(value)} />
 
                     <Legend />
 

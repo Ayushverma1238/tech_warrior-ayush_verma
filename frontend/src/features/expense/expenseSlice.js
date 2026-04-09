@@ -20,7 +20,7 @@ export const addExpense = createAsyncThunk(
     async (data, { getState, rejectWithValue }) => {
         try {
             const userId = getState().auth.user?.id;
-             console.log("USER ID:", userId);
+            console.log("USER ID:", userId);
             console.log("DATA:", data);
 
             if (!userId) throw new Error("User not found");
@@ -36,6 +36,30 @@ export const addExpense = createAsyncThunk(
         } catch (err) {
             console.error("ERROR:", err);
             return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
+export const updateExpense = createAsyncThunk(
+    "expense/update",
+    async ({ id, data }, { rejectWithValue }) => {
+        try {
+            const res = await API.put(`/api/expense/${id}`, data);
+            return res.data.data;
+        } catch (err) {
+            return rejectWithValue(err.response?.data);
+        }
+    }
+);
+
+export const deleteExpense = createAsyncThunk(
+    "expense/delete",
+    async (id, { rejectWithValue }) => {
+        try {
+            await API.delete(`/api/expense/${id}`);
+            return id;
+        } catch (err) {
+            return rejectWithValue(err.response?.data);
         }
     }
 );
@@ -65,6 +89,19 @@ const expenseSlice = createSlice({
 
             .addCase(addExpense.fulfilled, (state, action) => {
                 state.list.unshift(action.payload);
+            })
+
+            // UPDATE
+            .addCase(updateExpense.fulfilled, (state, action) => {
+                const index = state.list.findIndex(e => e.id === action.payload.id);
+                if (index !== -1) {
+                    state.list[index] = action.payload;
+                }
+            })
+
+            // DELETE
+            .addCase(deleteExpense.fulfilled, (state, action) => {
+                state.list = state.list.filter(e => e.id !== action.payload);
             });
     },
 });

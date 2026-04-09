@@ -1,15 +1,25 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { formatINR } from "@/utils/format";
 
-const StatCard = ({ title, value, icon: Icon }) => {
+const SummaryCard = ({ title, value, highlight, isPercent, icon: Icon }) => {
+    const color =
+        highlight === "red"
+            ? "text-red-500"
+            : highlight === "blue"
+                ? "text-blue-500"
+                : "text-gray-800";
+
     return (
         <Card className="rounded-2xl shadow-sm hover:shadow-md transition">
             <CardContent className="p-5 flex justify-between items-center">
 
                 <div>
                     <p className="text-sm text-muted-foreground">{title}</p>
-                    <h2 className="text-2xl font-bold">
-                        {formatINR(value)}
+
+                    <h2 className={`text-2xl font-bold ${color}`}>
+                        {isPercent
+                            ? `${value}%`
+                            : formatINR(value)}
                     </h2>
                 </div>
 
@@ -23,4 +33,4 @@ const StatCard = ({ title, value, icon: Icon }) => {
     );
 };
 
-export default StatCard;
+export default SummaryCard;

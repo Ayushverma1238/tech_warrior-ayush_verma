@@ -14,6 +14,8 @@ import { useDispatch } from "react-redux";
 import { getUser } from "./features/auth/authSlice";
 import DisableNumberScroll from "./components/common/DisableNumberScroll";
 import { Toaster } from "sonner";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 function App() {
     const dispatch = useDispatch();
@@ -25,7 +27,7 @@ function App() {
     return (
         <>
             <DisableNumberScroll />
-            <Toaster position="top-right" />
+            <Toaster richColors position="top-right" />
             <BrowserRouter>
                 <Routes>
 
@@ -35,6 +37,15 @@ function App() {
                         element={
                             <PublicRoute>
                                 <Login />
+                            </PublicRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/register"
+                        element={
+                            <PublicRoute>
+                                <Register />
                             </PublicRoute>
                         }
                     />
@@ -49,6 +60,7 @@ function App() {
                     >
                         <Route path="/" element={<Navigate to="/dashboard" />} />
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/profile" element={<Profile />} />
                         <Route path="/expenses" element={<Expenses />} />
                         <Route path="/income" element={<Income />} />
                         <Route path="/tax" element={<Tax />} />

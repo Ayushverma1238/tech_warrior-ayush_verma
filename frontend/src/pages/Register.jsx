@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../features/auth/authSlice";
+import { registerUser } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 
-import { Mail, Lock, LogIn } from "lucide-react";
+import {
+    Mail,
+    Lock,
+    User,
+    UserPlus,
+} from "lucide-react";
 
-const Login = () => {
+const Register = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { loading, error } = useSelector((state) => state.auth);
 
     const [form, setForm] = useState({
+        name: "",
         email: "",
         password: "",
     });
@@ -23,8 +29,8 @@ const Login = () => {
         });
     };
 
-    const handleLogin = async () => {
-        const res = await dispatch(loginUser(form));
+    const handleRegister = async () => {
+        const res = await dispatch(registerUser(form));
 
         if (res.meta.requestStatus === "fulfilled") {
             navigate("/dashboard");
@@ -39,28 +45,41 @@ const Login = () => {
                 {/* HEADER */}
                 <div className="text-center space-y-2">
                     <div className="flex justify-center">
-                        <div className="p-3 bg-blue-100 rounded-xl">
-                            <LogIn className="text-blue-600 w-6 h-6" />
+                        <div className="p-3 bg-green-100 rounded-xl">
+                            <UserPlus className="text-green-600 w-6 h-6" />
                         </div>
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">
-                        Welcome Back
+                        Create Account
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Login to your FinFlow account
+                        Start managing your finances 🚀
                     </p>
                 </div>
 
                 {/* FORM */}
                 <div className="space-y-4">
 
+                    {/* NAME */}
+                    <div className="flex items-center border rounded-xl px-3 py-2 focus-within:ring-2 ring-green-200">
+                        <User className="w-4 h-4 text-gray-400 mr-2" />
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Full Name"
+                            value={form.name}
+                            onChange={handleChange}
+                            className="w-full outline-none text-sm"
+                        />
+                    </div>
+
                     {/* EMAIL */}
-                    <div className="flex items-center border rounded-xl px-3 py-2 focus-within:ring-2 ring-blue-200">
+                    <div className="flex items-center border rounded-xl px-3 py-2 focus-within:ring-2 ring-green-200">
                         <Mail className="w-4 h-4 text-gray-400 mr-2" />
                         <input
                             type="email"
                             name="email"
-                            placeholder="Email address"
+                            placeholder="Email"
                             value={form.email}
                             onChange={handleChange}
                             className="w-full outline-none text-sm"
@@ -68,7 +87,7 @@ const Login = () => {
                     </div>
 
                     {/* PASSWORD */}
-                    <div className="flex items-center border rounded-xl px-3 py-2 focus-within:ring-2 ring-blue-200">
+                    <div className="flex items-center border rounded-xl px-3 py-2 focus-within:ring-2 ring-green-200">
                         <Lock className="w-4 h-4 text-gray-400 mr-2" />
                         <input
                             type="password"
@@ -89,29 +108,27 @@ const Login = () => {
 
                     {/* BUTTON */}
                     <button
-                        onClick={handleLogin}
+                        onClick={handleRegister}
                         disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-2 rounded-xl font-medium flex items-center justify-center gap-2"
+                        className="w-full bg-green-600 hover:bg-green-700 transition text-white py-2 rounded-xl font-medium"
                     >
-                        <LogIn size={16} />
-                        {loading ? "Logging in..." : "Login"}
+                        {loading ? "Creating account..." : "Register"}
                     </button>
                 </div>
 
                 {/* FOOTER */}
-                <div className="text-center text-sm text-gray-500">
-                    Don’t have an account?{" "}
+                <p className="text-sm text-center text-gray-500">
+                    Already have an account?{" "}
                     <span
-                        onClick={() => navigate("/register")}
-                        className="text-blue-600 cursor-pointer font-medium hover:underline"
+                        onClick={() => navigate("/login")}
+                        className="text-green-600 cursor-pointer font-medium"
                     >
-                        Register
+                        Login
                     </span>
-                </div>
-
+                </p>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default Register;
