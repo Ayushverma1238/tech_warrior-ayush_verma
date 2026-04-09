@@ -15,7 +15,9 @@ import {
     IndianRupee,
     Wallet,
     PieChart as PieIcon,
-    BarChart3
+    BarChart3,
+    CalendarDays,
+    Sparkles
 } from "lucide-react";
 
 import { formatINR } from "@/utils/format";
@@ -31,29 +33,20 @@ const Dashboard = () => {
 
     if (loading || !data) {
         return (
-            <div className="flex flex-col items-center justify-center h-[70vh] gap-8">
-
-                {/* Animated Gradient Ring */}
+            <div className="flex flex-col items-center justify-center h-[70vh] gap-6">
                 <div className="relative">
                     <div className="h-16 w-16 rounded-full border-4 border-gray-200"></div>
                     <div className="absolute top-0 left-0 h-16 w-16 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
                 </div>
 
-                {/* Heading */}
                 <div className="text-center">
                     <h2 className="text-lg font-semibold text-gray-800">
                         Loading Dashboard
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500">
                         Preparing your financial insights...
                     </p>
                 </div>
-
-                {/* Progress Bar */}
-                <div className="w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full w-1/2 bg-indigo-500 animate-[loading_1.2s_infinite]"></div>
-                </div>
-
             </div>
         );
     }
@@ -80,25 +73,32 @@ const Dashboard = () => {
     const isSaving = data.savings > data.loss;
 
     return (
-        <div className="bg-linear-to-br from-gray-50 to-gray-100 min-h-screen p-6 space-y-8">
+        <div className="min-h-screen p-6 space-y-8 bg-linear-to-br from-slate-50 via-white to-slate-100">
 
             {/* HEADER */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <BarChart3 className="w-7 h-7 text-blue-500" />
-                        Dashboard
+                    <h1 className="text-3xl font-bold flex items-center gap-2">
+                        <BarChart3 className="w-7 h-7 text-indigo-600" />
+                        Financial Dashboard
                     </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Overview of your financial activity
-                    </p>
-                </div>
 
-                <Badge variant="secondary">Updated</Badge>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                            <CalendarDays className="w-4 h-4" />
+                            {new Date().toDateString()}
+                        </span>
+
+                        <Badge className="bg-green-100 text-green-700 border-none">
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            Live Data
+                        </Badge>
+                    </div>
+                </div>
             </div>
 
             {/* STATS */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Income" value={data.totalIncome} icon={IndianRupee} />
                 <StatCard title="Expense" value={data.totalExpense} icon={Wallet} />
                 <StatCard title="Savings" value={data.savings} icon={TrendingUp} />
@@ -107,13 +107,14 @@ const Dashboard = () => {
 
             {/* INSIGHT */}
             <Card
-                className={`border-l-4 ${isSaving
-                    ? "border-green-500 bg-green-50"
-                    : "border-red-500 bg-red-50"
-                    }`}
+                className={`rounded-2xl shadow-md border-l-4 ${
+                    isSaving
+                        ? "border-green-500 bg-green-50"
+                        : "border-red-500 bg-red-50"
+                }`}
             >
-                <CardContent className="p-5 flex items-start gap-4">
-                    <div className="mt-1">
+                <CardContent className="p-6 flex items-start gap-4">
+                    <div className="p-3 rounded-full bg-white shadow">
                         {isSaving ? (
                             <TrendingUp className="text-green-500" />
                         ) : (
@@ -122,26 +123,26 @@ const Dashboard = () => {
                     </div>
 
                     <div>
-                        <p className="text-sm text-gray-600">Insight</p>
+                        <p className="text-sm text-gray-500">Insight</p>
 
                         <h2 className="text-lg font-semibold mt-1">
                             {isSaving
-                                ? "You're saving well this month 🎉"
-                                : "Expenses are higher than income ⚠️"}
+                                ? "Great job! You're saving well 🎉"
+                                : "Warning: Expenses exceed income ⚠️"}
                         </h2>
 
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-gray-600 mt-1">
                             {isSaving
-                                ? `You saved ${formatINR(data.savings)}`
-                                : `You lost ${formatINR(data.loss)}`}
+                                ? `You saved ${formatINR(data.savings)} this period`
+                                : `You lost ${formatINR(data.loss)} this period`}
                         </p>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* CHART SECTION TITLE */}
+            {/* SECTION TITLE */}
             <div className="flex items-center gap-2">
-                <PieIcon className="w-5 h-5 text-purple-500" />
+                <PieIcon className="w-5 h-5 text-purple-600" />
                 <h2 className="text-lg font-semibold">
                     Financial Analytics
                 </h2>
@@ -149,29 +150,35 @@ const Dashboard = () => {
 
             {/* CHARTS */}
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-                <LineChartComponent
-                    title="Monthly Income vs Expense"
-                    data={formattedData}
-                />
+                <div className="rounded-2xl shadow-md bg-white p-4">
+                    <LineChartComponent
+                        title="Monthly Income vs Expense"
+                        data={formattedData}
+                    />
+                </div>
 
-                <PieChartComponent
-                    data={expensePie}
-                    title="Expense Distribution"
-                />
+                <div className="rounded-2xl shadow-md bg-white p-4">
+                    <PieChartComponent
+                        data={expensePie}
+                        title="Expense Distribution"
+                    />
+                </div>
             </div>
 
-            {/* INCOME SOURCES */}
+            {/* INCOME SECTION */}
             <div className="flex items-center gap-2">
-                <IndianRupee className="w-5 h-5 text-green-500" />
+                <IndianRupee className="w-5 h-5 text-green-600" />
                 <h2 className="text-lg font-semibold">
                     Income Sources
                 </h2>
             </div>
 
-            <PieChartComponent
-                data={incomePie}
-                title="Income Breakdown"
-            />
+            <div className="rounded-2xl shadow-md bg-white p-4">
+                <PieChartComponent
+                    data={incomePie}
+                    title="Income Breakdown"
+                />
+            </div>
         </div>
     );
 };
