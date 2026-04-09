@@ -31,8 +31,29 @@ const Dashboard = () => {
 
     if (loading || !data) {
         return (
-            <div className="p-6 text-center text-gray-500">
-                Loading dashboard...
+            <div className="flex flex-col items-center justify-center h-[70vh] gap-8">
+
+                {/* Animated Gradient Ring */}
+                <div className="relative">
+                    <div className="h-16 w-16 rounded-full border-4 border-gray-200"></div>
+                    <div className="absolute top-0 left-0 h-16 w-16 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+                </div>
+
+                {/* Heading */}
+                <div className="text-center">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Loading Dashboard
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Preparing your financial insights...
+                    </p>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-56 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-1/2 bg-indigo-500 animate-[loading_1.2s_infinite]"></div>
+                </div>
+
             </div>
         );
     }
@@ -87,8 +108,8 @@ const Dashboard = () => {
             {/* INSIGHT */}
             <Card
                 className={`border-l-4 ${isSaving
-                        ? "border-green-500 bg-green-50"
-                        : "border-red-500 bg-red-50"
+                    ? "border-green-500 bg-green-50"
+                    : "border-red-500 bg-red-50"
                     }`}
             >
                 <CardContent className="p-5 flex items-start gap-4">

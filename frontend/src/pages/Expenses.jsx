@@ -139,8 +139,24 @@ const Expenses = () => {
             <div className="bg-white rounded-2xl shadow-md p-5">
 
                 {loading ? (
-                    <div className="flex justify-center py-16 text-gray-500">
-                        Loading expenses...
+                    <div className="flex flex-col items-center justify-center py-20 gap-6">
+
+                        {/* Gradient Spinner */}
+                        <div className="relative">
+                            <div className="h-14 w-14 rounded-full border-4 border-gray-200"></div>
+                            <div className="absolute top-0 left-0 h-14 w-14 rounded-full border-4 border-red-500 border-t-transparent animate-spin"></div>
+                        </div>
+
+                        {/* Title */}
+                        <p className="text-sm font-medium text-gray-600 tracking-wide">
+                            Loading your expenses...
+                        </p>
+
+                        {/* Animated progress bar */}
+                        <div className="w-48 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-full w-1/2 bg-red-500 animate-[loading_1.2s_infinite]"></div>
+                        </div>
+
                     </div>
                 ) : list.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">

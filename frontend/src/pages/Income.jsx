@@ -88,7 +88,22 @@ const Income = () => {
         : 0;
 
     if (loading) {
-        return <div className="p-6 text-gray-500">Loading income...</div>;
+        return (
+            <div className="flex flex-col items-center justify-center h-[60vh] gap-6">
+
+                <div className="h-14 w-14 rounded-full bg-linear-to-tr from-indigo-500 via-purple-500 to-pink-500 animate-spin p-0.75">
+                    <div className="h-full w-full bg-white rounded-full"></div>
+                </div>
+
+                <p className="text-sm font-medium text-gray-600 tracking-wide">
+                    Fetching your income...
+                </p>
+
+                <div className="w-40 h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-1/2 bg-indigo-500 animate-[loading_1s_infinite]"></div>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -136,7 +151,7 @@ const Income = () => {
                     onValueChange={(value) =>
                         setFilters({
                             ...filters,
-                            source: value === "all" ? "" : value, 
+                            source: value === "all" ? "" : value,
                         })
                     }
                 >
