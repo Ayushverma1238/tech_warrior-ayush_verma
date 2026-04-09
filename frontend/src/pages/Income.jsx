@@ -4,138 +4,140 @@ import {
     fetchIncome,
     addIncome,
     deleteIncome,
-    updateIncome
+    updateIncome,
 } from "../features/income/incomeSlice";
+
+import IncomeForm from "@/components/income/IncomeForm";
+import IncomeTable from "@/components/income/IncomeTable";
+import IncomeCard from "@/components/income/IncomeCard";
+import { toast } from "sonner";
 
 const Income = () => {
     const dispatch = useDispatch();
+
     const { list, loading } = useSelector((state) => state.income);
     const token = useSelector((state) => state.auth.token);
 
-    const [form, setForm] = useState({
-        source: "",
-        amount: "",
-        date: "",
-    });
-
-    const [editId, setEditId] = useState(null);
+    const [editItem, setEditItem] = useState(null);
 
     useEffect(() => {
         if (token) dispatch(fetchIncome());
     }, [dispatch, token]);
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    // const handleSubmit = (form) => {
+    //     if (editItem) {
+    //         dispatch(updateIncome({ id: editItem.id, data: form }));
+    //         setEditItem(null);
+    //     } else {
+    //         dispatch(addIncome(form));
+    //     }
+    // };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // const handleDelete = (id) => {
+    //     dispatch(deleteIncome(id));
+    // };
 
-        if (!form.source || !form.amount) return;
 
-        if (editId) {
-            dispatch(updateIncome({ id: editId, data: form }));
-            setEditId(null);
-        } else {
-            dispatch(addIncome(form));
+    const handleSubmit = async (form) => {
+        try {
+            if (editItem) {
+                await dispatch(updateIncome({ id: editItem.id, data: form })).unwrap();
+                toast.success("Income updated successfully");
+                setEditItem(null);
+            } else {
+                await dispatch(addIncome(form)).unwrap();
+                toast.success("Income added successfully");
+            }
+        } catch (err) {
+            toast.error(err || "Something went wrong");
         }
-
-        setForm({ source: "", amount: "", date: "" });
     };
 
-    const handleEdit = (item) => {
-        setForm(item);
-        setEditId(item.id);
+    const handleDelete = async (id) => {
+        try {
+            await dispatch(deleteIncome(id)).unwrap();
+            toast.success("Income deleted");
+        } catch (err) {
+            toast.error("Delete failed");
+        }
     };
 
-    const handleDelete = (id) => {
-        dispatch(deleteIncome(id));
-    };
 
-    if (loading) return <p className="p-6">Loading...</p>;
+
+
+
+
+    // Total Income (UX upgrade)
+    const totalIncome = list.reduce((acc, item) => acc + Number(item.amount || 0), 0);
+
+    if (loading) {
+        return (
+            <div className="p-6 text-gray-500">
+                Loading income...
+            </div>
+        );
+    }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
 
-            {/* FORM */}
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-4 rounded-xl shadow grid md:grid-cols-4 gap-4"
-            >
-                <input
-                    name="source"
-                    value={form.source}
-                    onChange={handleChange}
-                    placeholder="Source"
-                    className="border p-2 rounded"
+            {/* HEADER */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-semibold text-gray-800">
+                        Income
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                        Track and manage your earnings
+                    </p>
+                </div>
+
+                <IncomeForm
+                    onSubmit={handleSubmit}
+                    editData={editItem}
+                    setEditData={setEditItem}
                 />
+            </div>
 
-                <input
-                    name="amount"
-                    value={form.amount}
-                    onChange={handleChange}
-                    type="number"
-                    placeholder="Amount"
-                    className="border p-2 rounded"
-                />
+            {/* STATS CARD */}
+            <div className="bg-white rounded-2xl shadow-sm border p-5 flex justify-between items-center">
+                <div>
+                    <p className="text-sm text-gray-500">Total Income</p>
+                    <h2 className="text-2xl font-bold text-green-600">
+                        ₹ {totalIncome.toLocaleString()}
+                    </h2>
+                </div>
+            </div>
 
-                <input
-                    name="date"
-                    value={form.date}
-                    onChange={handleChange}
-                    type="date"
-                    className="border p-2 rounded"
-                />
+            {/* CONTENT */}
+            <div className="bg-white rounded-2xl shadow-sm border p-4">
 
-                <button className="bg-blue-600 text-white rounded px-4">
-                    {editId ? "Update" : "Add"}
-                </button>
-            </form>
+                {list.length === 0 ? (
+                    <div className="text-center py-16">
+                        <p className="text-gray-400 text-sm">
+                            No income records yet
+                        </p>
+                        <p className="text-gray-300 text-xs mt-1">
+                            Click "Add Income" to get started
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        {/* TABLE */}
+                        <IncomeTable
+                            list={list}
+                            onEdit={setEditItem}
+                            onDelete={handleDelete}
+                        />
 
-            {/* TABLE */}
-            <div className="bg-white rounded-xl shadow overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-3">Source</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {list.length === 0 ? (
-                            <tr>
-                                <td colSpan="4" className="text-center p-4">
-                                    No income found
-                                </td>
-                            </tr>
-                        ) : (
-                            list.map((i) => (
-                                <tr key={i.id} className="border-t text-center">
-                                    <td className="p-2">{i.source}</td>
-                                    <td>₹ {i.amount}</td>
-                                    <td>{i.date?.slice(0, 10)}</td>
-                                    <td className="space-x-2">
-                                        <button
-                                            onClick={() => handleEdit(i)}
-                                            className="text-blue-600"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(i.id)}
-                                            className="text-red-600"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                        {/* CARD */}
+                        <IncomeCard
+                            list={list}
+                            onEdit={setEditItem}
+                            onDelete={handleDelete}
+                        />
+                    </>
+                )}
             </div>
         </div>
     );
