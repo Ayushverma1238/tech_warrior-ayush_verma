@@ -33,7 +33,50 @@ const Tax = () => {
         dispatch(fetchTax());
     }, [dispatch]);
 
-    if (loading) return <LoadingState />;
+    if (loading) {
+        return (
+            <div className="p-6 md:p-10 space-y-8 animate-pulse min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
+
+                {/* HEADER */}
+                <div className="space-y-2">
+                    <div className="h-8 w-64 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-40 bg-gray-100 rounded"></div>
+                </div>
+
+                {/* SUMMARY */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white rounded-2xl shadow-sm p-5 border">
+                            <div className="h-4 w-24 bg-gray-200 rounded mb-3"></div>
+                            <div className="h-6 w-32 bg-gray-300 rounded"></div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* RECOMMENDATION CARD */}
+                <div className="h-28 rounded-2xl bg-linear-to-r from-gray-200 to-gray-100"></div>
+
+                {/* CHARTS */}
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="h-64 bg-white rounded-2xl shadow-sm border"></div>
+                    <div className="h-64 bg-white rounded-2xl shadow-sm border"></div>
+                </div>
+
+                {/* REGIME */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="h-28 bg-white rounded-2xl shadow-sm border"></div>
+                    <div className="h-28 bg-white rounded-2xl shadow-sm border"></div>
+                </div>
+
+                {/* BOTTOM SECTIONS */}
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="h-48 bg-white rounded-2xl shadow-sm border"></div>
+                    <div className="h-48 bg-white rounded-2xl shadow-sm border"></div>
+                </div>
+            </div>
+        );
+    }
+
     if (!data) return <EmptyState />;
 
     const taxableIncome = Number(data?.taxableIncome ?? 0);
