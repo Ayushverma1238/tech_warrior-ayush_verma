@@ -27,9 +27,8 @@ const MONTH_MAP = {
 
 const getMonthIndex = (month) => {
     if (!month) return 999;
-
     const key = month.toString().toLowerCase().trim();
-    return MONTH_MAP[key] ?? 999; 
+    return MONTH_MAP[key] ?? 999;
 };
 
 const LineChartComponent = ({ data = [], title = "Monthly Overview" }) => {
@@ -58,9 +57,20 @@ const LineChartComponent = ({ data = [], title = "Monthly Overview" }) => {
                     <CartesianGrid strokeDasharray="3 3" />
 
                     <XAxis dataKey="month" />
-                    <YAxis />
 
-                    <Tooltip formatter={(value) => formatINR(value)} />
+                    <YAxis
+                        tickFormatter={(value) => `₹${formatINR(value)}`}
+                        width={80}
+                    />
+
+                    <Tooltip
+                        formatter={(value) => `₹${formatINR(value)}`}
+                        contentStyle={{
+                            borderRadius: "12px",
+                            border: "none",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                        }}
+                    />
 
                     <Legend />
 
