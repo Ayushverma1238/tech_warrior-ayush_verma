@@ -35,9 +35,6 @@ frontend/dist/
 target/
 *.log
 
-# Maven
-.mvn/wrapper/maven-wrapper.jar
-
 # IDE
 .idea/
 *.iml
